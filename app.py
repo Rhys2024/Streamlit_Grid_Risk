@@ -478,6 +478,24 @@ dependent = col2.selectbox(label='Pick a Factor',
                       options=factor_options_daily,
                       key='factor')
 
+with col1:
+    
+    sub_col_yuh1, sub_col_yuh2 = st.columns(2)
+    
+    rot = sub_col_yuh1.toggle(label='Rate of Change',
+                                    value = False,
+                                    key='gradient')
+    
+    if rot:
+        diff_days = sub_col_yuh2.slider(label='Difference',
+                                min_value = 5,
+                                max_value= 120,
+                                value = 20,
+                                step=5,
+                                key='diff_days')
+    else:
+        diff_days = 0
+
 
 with col1:
         sub_col_dates1, sub_col_dates2 = st.columns(2)
@@ -504,6 +522,10 @@ with col1:
 # [col for col in df3.columns if '<= 0' not in  col]
 cols = cols_for_factor[st.session_state.factor]
  
+
+toggle_equal_weight = col2.toggle(label='Show Equal-Weight',
+                            value = False,
+                            key='equal_weight')
 
 # 'Date' not in col and 
 with col2:
@@ -553,10 +575,6 @@ benchmark = col2.selectbox(label='Benchmark', options = benchmark_options, key =
 
 #st.divider()
 
-toggle_equal_weight = col2.toggle(label='Show Equal-Weight',
-                            value = False,
-                            key='equal_weight')
-
 
 #st.divider()
 
@@ -573,19 +591,7 @@ with col1:
                                     min_value=3,
                                     key='score_bounds')
 
-    rot = col_under_all1.toggle(label='Show Rate of Change',
-                                value = False,
-                                key='gradient')
-
-    if rot:
-        diff_days = col_under_all2.slider(label='Number of Days to Difference',
-                                min_value = 5,
-                                max_value= 120,
-                                value = 20,
-                                step=5,
-                                key='diff_days')
-    else:
-        diff_days = 0
+    
 
 
 
