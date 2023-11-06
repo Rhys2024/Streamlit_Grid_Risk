@@ -232,7 +232,7 @@ def create_fig(pivot_df,
     #, paper_bgcolor="LightSteelBlue"
     fig.update_layout(plot_bgcolor='gray', 
                     template = 'plotly_white',
-                    #title = f'{dep_name} Forward Returns <br><sup>Across {var1} and {var2}</sup>'
+                    title = f'{dep_name} Forward Returns <br><sup>Across {var1_name} and {var2_name}</sup>'
                     )
     fig.update_xaxes(showgrid=True)
     fig.update_traces(hovertemplate = "x-score: %{x} <br>y-score: %{y} </br>Forward Return: %{z}")
@@ -243,9 +243,9 @@ def create_fig(pivot_df,
               line=dict(color="blue", width = 4),
               )
     
-    st.subheader(f'{dep_name} Forward Returns')
-    st.write(f'Across {var1_name} and {var2_name}')
-    st.plotly_chart(fig, use_container_width = True)
+    #st.subheader(f'{dep_name} Forward Returns')
+    #st.write(f'Across {var1_name} and {var2_name}')
+    #st.plotly_chart(fig, use_container_width = True)
     
     return fig
 
@@ -427,7 +427,7 @@ class Grid():
         #, paper_bgcolor="LightSteelBlue"
         fig.update_layout(plot_bgcolor='gray', 
                         template = 'plotly_white',
-                        #title = f'{dep_name} Forward Returns <br><sup>Across {var1} and {var2}</sup>'
+                        title = f'{dep_name} Forward Returns <br><sup>Across {var1_name} and {var2_name}</sup>'
                         )
         fig.update_xaxes(showgrid=True)
         fig.update_traces(hovertemplate = "x-score: %{x} <br>y-score: %{y} </br>Forward Return: %{z}")
@@ -495,6 +495,10 @@ with col1:
         lookback = sub_col_dates1.number_input(label = 'Lookback (months)', min_value=1, 
                         max_value=36, value = 12, step=3,
                         key='lookback')
+        
+        forward = sub_col_dates2.number_input(label = 'Forward Returns (months)', min_value=1, 
+                            max_value=36, value = 12, step=3,
+                            key='forward')
    
 
 # [col for col in df3.columns if '<= 0' not in  col]
@@ -518,16 +522,14 @@ with col2:
                     key='optional_col')
 
 
-with col2:
+#with col2:
 
-    sub_col11, sub_col22 = st.columns(2)
+    #sub_col11, sub_col22 = st.columns(2)
 
-    benchmark = sub_col11.selectbox(label='Benchmark', options = benchmark_options, key = 'benchmark')
+benchmark = col2.selectbox(label='Benchmark', options = benchmark_options, key = 'benchmark')
 
     #forward_period = 
-    forward = sub_col22.number_input(label = 'Forward Returns (months)', min_value=1, 
-                            max_value=36, value = 12, step=3,
-                            key='forward')
+    
 
        
 
@@ -558,34 +560,38 @@ toggle_equal_weight = col2.toggle(label='Show Equal-Weight',
 
 #st.divider()
 
+col_under_all1, col_under_all2, col_under_all3 = st.columns(3)
 
-col_under1, col_under2 = st.columns(2)
 
-bounds = col_under1.number_input(label='Z-Score Bounds',
-                                 value=3,
-                                 max_value=8,
-                                 min_value=3,
-                                 key='score_bounds')
+with col1:
+    
+    col_under1, col_under2 = st.columns(2)
 
-rot = col_under1.toggle(label='Show Rate of Change',
-                            value = False,
-                            key='gradient')
+    bounds = col_under1.number_input(label='Z-Score Bounds',
+                                    value=3,
+                                    max_value=8,
+                                    min_value=3,
+                                    key='score_bounds')
 
-if rot:
-    diff_days = col_under1.slider(label='Number of Days to Difference',
-                            min_value = 5,
-                            max_value= 120,
-                            value = 20,
-                            step=5,
-                            key='diff_days')
-else:
-    diff_days = 0
+    rot = col_under_all1.toggle(label='Show Rate of Change',
+                                value = False,
+                                key='gradient')
+
+    if rot:
+        diff_days = col_under_all2.slider(label='Number of Days to Difference',
+                                min_value = 5,
+                                max_value= 120,
+                                value = 20,
+                                step=5,
+                                key='diff_days')
+    else:
+        diff_days = 0
 
 
 
 
 fig = run()
     
-#st.plotly_chart(fig, use_container_width = True)
+st.plotly_chart(fig, use_container_width = True)
 
 #print(st.session_state.count)
