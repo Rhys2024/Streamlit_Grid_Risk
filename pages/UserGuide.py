@@ -31,7 +31,7 @@ st.markdown("""The Grid compotent follows a risk approach designed by Rhys Logan
 file_path = Path('Motivation.pdf')
 
 
-with open('/Users/rhys/Desktop/streamlit_test/Motivation.pdf', "rb") as file:
+with open('/Users/rhys/Desktop/grid_risk_management/Motivation.pdf', "rb") as file:
     btn = st.download_button(
             label="Download Paper",
             data=file,
