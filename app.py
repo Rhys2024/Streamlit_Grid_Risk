@@ -24,7 +24,8 @@ benchmark_options = ['None'] + [f"{key} - {sub}" for key in refr.benchmarks
 
 days_in_month = 21
 
-with open("/Users/rhys/Desktop/grid_risk_management/data/references/cols_for_factor.json", "r") as write_file:
+# /Users/rhys/Desktop/grid_risk_management/
+with open("data/references/cols_for_factor.json", "r") as write_file:
     cols_for_factor = json.load(write_file)
 
 
@@ -35,14 +36,17 @@ with open("/Users/rhys/Desktop/grid_risk_management/data/references/cols_for_fac
 @st.cache_data()
 def get_Data(daily=True):
     
+    # /Users/rhys/Desktop/grid_risk_management/
     if daily:
-        temp_df = pd.read_csv(f'/Users/rhys/Desktop/grid_risk_management/data/full_daily_data.csv', 
+        temp_df = pd.read_csv(f'data/full_daily_data.csv', 
                           header=[0, 1],
                           index_col=0,
                           parse_dates=True)
         return temp_df
+    
+    # /Users/rhys/Desktop/grid_risk_management/
 
-    temp_df = pd.read_csv(f'/Users/rhys/Desktop/grid_risk_management/data/full_monthly_data.csv', 
+    temp_df = pd.read_csv(f'data/full_monthly_data.csv', 
                           header=[0, 1],
                           index_col=0,
                           parse_dates=True)
@@ -550,33 +554,9 @@ with col2:
 
 benchmark = col2.selectbox(label='Benchmark', options = benchmark_options, key = 'benchmark')
 
-    #forward_period = 
+#forward_period = 
     
 
-       
-
-#grid.create_var_dep_frame(ivars=st.session_state.ivars, dependent=st.session_state.factor)
-   
-
-#print(grid.var_frame) 
-
-#st.divider()
-
-#col21, col22, col23, col24 = st.columns(4)
-#bounds = col23.number_input(label = 'Z-Score Bounds', min_value=3, 
-                        #max_value=8, value = 4, key='bounds')
-
-
-#dependent2 = col2.selectbox(label='Pick a Factor',
-                            #label_visibility = 'hidden',
-                      #options=factor_options_daily,
-                      #key='factor2')
-
-
-#st.divider()
-
-
-#st.divider()
 
 col_under_all1, col_under_all2, col_under_all3 = st.columns(3)
 
