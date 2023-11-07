@@ -175,10 +175,11 @@ def get_factor_data(factor, split = 'Daily', start = datetime.datetime(2010, 1, 
     
     if save_data:
         
+        # Users/rhys/Desktop/grid_risk_management/
         if eq_weight:
-            data.to_csv(f'/Users/rhys/Desktop/grid_risk_management/data/{factor} - {split} - Equal-Weight.csv')
+            data.to_csv(f'data/{factor} - {split} - Equal-Weight.csv')
         else:
-            data.to_csv(f'/Users/rhys/Desktop/grid_risk_management/data/{factor} - {split}.csv')
+            data.to_csv(f'data/{factor} - {split}.csv')
         
         print(f'{factor} - {split} Data Saved!')
 
@@ -200,7 +201,8 @@ def get_fred_series(series_name, sub_category = None,
     series.index.name = 'Date'
     
     if save_data:
-        series.to_csv(f'/Users/rhys/Desktop/grid_risk_management/data/{series_name} - {sub_category}.csv')
+        #/Users/rhys/Desktop/grid_risk_management/
+        series.to_csv(f'data/{series_name} - {sub_category}.csv')
         print(f'{series_name} - {sub_category} Data Saved!')
     
     return series
@@ -218,7 +220,8 @@ def update_factor_col_mapping():
             
             name = f'{factor} - {split}'
             
-            temp_data = pd.read_csv(f'/Users/rhys/Desktop/grid_risk_management/data/{name}.csv', 
+            # /Users/rhys/Desktop/grid_risk_management/
+            temp_data = pd.read_csv(f'data/{name}.csv', 
                                     index_col='Date')
             
             if '<= 0' in temp_data.columns or '< 0' in temp_data.columns:
@@ -275,7 +278,9 @@ if __name__ == '__main__':
             
                 if 'Daily' in name:
                     
-                    temp_data = pd.read_csv(f'/Users/rhys/Desktop/grid_risk_management/data/{name}.csv', 
+                    # /Users/rhys/Desktop/grid_risk_management/
+                    
+                    temp_data = pd.read_csv(f'data/{name}.csv', 
                                         index_col='Date', parse_dates=True) / 100
                     
                     cols_list = []
@@ -295,7 +300,8 @@ if __name__ == '__main__':
             if refr.fred_data[key][sub_key]['freq'] != 'D':
                 continue
             
-            temp_data = pd.read_csv(f'/Users/rhys/Desktop/grid_risk_management/data/{name}.csv', 
+            # /Users/rhys/Desktop/grid_risk_management/
+            temp_data = pd.read_csv(f'data/{name}.csv', 
                                     index_col='Date', parse_dates=True)
             
             cols_list = []
@@ -311,7 +317,8 @@ if __name__ == '__main__':
             
             name = f'{key} - {bench}'
             
-            temp_data = pd.read_csv(f'/Users/rhys/Desktop/grid_risk_management/data/{name}.csv', 
+            # /Users/rhys/Desktop/grid_risk_management/
+            temp_data = pd.read_csv(f'data/{name}.csv', 
                                     index_col='Date', parse_dates=True)
             
             cols_list = []
@@ -331,6 +338,6 @@ if __name__ == '__main__':
     #  - Equal-Weight
     #print(full_data['Indices - Russell 2000']['Russell 2000'].dropna())
     #print(full_data['Commodities - US Gas Prices']['US Gas Prices'].dropna())
-    full_data.to_csv('/Users/rhys/Desktop/grid_risk_management/data/full_daily_data.csv', 
-                     index=True, index_label='Date')
+    #full_data.to_csv('/Users/rhys/Desktop/grid_risk_management/data/full_daily_data.csv', 
+                     #index=True, index_label='Date')
     
