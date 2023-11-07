@@ -70,7 +70,6 @@ fred_freqs = {
 
 # 'intial_claims' : 'IC4WSA', 
 fred_data = {
-    
     'volatility' : {'VIX' : 'VIXCLS', 'market_vol' : 'VXVCLS', 'oil_vol' : 'OVXCLS', 'small_cap_vol' : 'RVXCLS'},
     'real rates' : {'10Y_real_rate' : 'DFII10', '5Y_real_rate' : 'DFII5', '7Y_real_rate' : 'DFII7', 
                     '20Y_real_rate' : 'DFII20', '30Y_real_rate' : 'DFII30'},
@@ -338,7 +337,18 @@ def create_full_df():
     
 
 
-#if __name__ == '__main__':
+if __name__ == '__main__':
+    
+    import matplotlib.pyplot as plt
+    
+    poop = pd.read_csv('/Users/rhys/Desktop/grid_risk_management/data/full_daily_data.csv',
+                          header=[0, 1],
+                          index_col=0,
+                          parse_dates=True)
+    
+    poop['Commodities - US Gas Prices']['US Gas Prices'].dropna().plot()
+    
+    plt.show()
     
     #pass
     
