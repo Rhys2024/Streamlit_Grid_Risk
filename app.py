@@ -124,7 +124,7 @@ def create_df(var1, var2, dependent, col_for_3,
         df_3_chunk = (daily_data[dependent][col_for_3] - 
                       daily_data[dependent][optional_col]).to_frame(name='Neutral Returns')
     elif benchmark != 'None':
-        benchmark_name = benchmark[benchmark.index('-') + 1:]
+        benchmark_name = benchmark[benchmark.index('-') + 2:]
         df_3_chunk = (daily_data[dependent][col_for_3] - 
                         daily_data[benchmark][benchmark_name]
                      ).to_frame(name = col_for_3)
@@ -328,7 +328,8 @@ class Grid():
     def __init__(self, ivars, dependent, 
                     col_for_3, 
                     optional_col, 
-                    benchmark, equal_weight
+                    benchmark,
+                    equal_weight
                 ) -> None:
         
         self.daily_data = get_Data(daily=True)
