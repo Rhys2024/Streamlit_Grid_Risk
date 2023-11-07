@@ -192,7 +192,7 @@ def handle_dependent(dependent):
     return name
 
 
-@st.cache_data()
+#@st.cache_data()
 def get_timeframe(df):
     
     temp = df.copy()
@@ -450,7 +450,12 @@ class Grid():
         return fig
 
 
+
+
+
 ########################################################## LAYOUT ##########################################################
+
+
 
 st.title("Grid Risk Management")
 
