@@ -262,8 +262,7 @@ def FullUpdate(test=True):
     pass
 
 
-
-if __name__ == '__main__':
+def create_full_df():
     
     list_of_frames = []
     #cols_list = []
@@ -283,7 +282,7 @@ if __name__ == '__main__':
                     temp_data = pd.read_csv(f'data/{name}.csv', 
                                         index_col='Date', parse_dates=True) / 100
                     
-                    cols_list = []
+                    #cols_list = []
                     
                     temp_data.columns = pd.MultiIndex.from_tuples([(name, col) for col in temp_data.columns])
                     
@@ -304,7 +303,7 @@ if __name__ == '__main__':
             temp_data = pd.read_csv(f'data/{name}.csv', 
                                     index_col='Date', parse_dates=True)
             
-            cols_list = []
+            #cols_list = []
             
             temp_data.columns = pd.MultiIndex.from_tuples([(name, col) for col in temp_data.columns])
             
@@ -321,7 +320,7 @@ if __name__ == '__main__':
             temp_data = pd.read_csv(f'data/{name}.csv', 
                                     index_col='Date', parse_dates=True)
             
-            cols_list = []
+            #cols_list = []
             
             temp_data.columns = pd.MultiIndex.from_tuples([(name, col) for col in temp_data.columns])
             
@@ -334,10 +333,12 @@ if __name__ == '__main__':
     
     full_data.index.names = ['Date']
     
-    #print(full_data)
-    #  - Equal-Weight
-    #print(full_data['Indices - Russell 2000']['Russell 2000'].dropna())
-    #print(full_data['Commodities - US Gas Prices']['US Gas Prices'].dropna())
-    #full_data.to_csv('/Users/rhys/Desktop/grid_risk_management/data/full_daily_data.csv', 
-                     #index=True, index_label='Date')
+    full_data.to_csv('/Users/rhys/Desktop/grid_risk_management/data/full_daily_data.csv', 
+                     index=True, index_label='Date')
+    
+
+
+#if __name__ == '__main__':
+    
+    #pass
     
