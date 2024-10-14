@@ -163,17 +163,26 @@ def scale_frame(frame, gradient):
 
 
 @st.cache_data()
-def create_pivot(frame, col_map):
+def create_pivots(frame, col_map):
     
     variables = [col_map['var1'], 
                      col_map['var2']]
     
     pivot_df = frame.groupby(variables)[col_map['dependent']].mean().unstack()
-    
     pivot_df.index.name = col_map['var1']
     pivot_df.columns.name = col_map['var2']
-    # [pivot_df.index.abs() < 5][[col for col in pivot_df if abs(col) < 5]]
-    return pivot_df.round(3)
+    
+
+    frame2 = frame.copy()
+    frame2[variables] = (frame2[variables] > 0).map(lambda x: "Up" if x else "Down")
+
+    two_way_piv = frame2.groupby(variables)[col_map['dependent']].mean().unstack().sort_index(ascending = False)
+    two_way_piv.index.name = col_map['var1']
+    two_way_piv.columns.name = col_map['var2']
+    
+    
+
+    return pivot_df.round(3), two_way_piv.round(3)
 
 
 def validate_vars(ivars):
@@ -210,13 +219,17 @@ def create_fig(pivot_df,
     var1_name = col_maps['var1']
     var2_name = col_maps['var2']
     dependent_name = col_maps['dependent']
+
+    if isinstance(pivot_df.columns[0], str):
+        origin = 'upper'
+    else:
+        origin = 'lower'
     
-    fig = px.imshow(pivot_df, color_continuous_midpoint=0.0, 
+    fig = px.imshow(pivot_df, 
+                    color_continuous_midpoint=0.0, 
                     color_continuous_scale=['red', 'white', 'green'], 
-                    origin = 'lower', 
+                    origin = origin,
                     aspect='equal',
-                     
-                    #text_auto='.2f'
                     )
     
     fig.update_layout(
@@ -236,12 +249,14 @@ def create_fig(pivot_df,
     #, paper_bgcolor="LightSteelBlue"
     fig.update_layout(plot_bgcolor='gray', 
                     template = 'plotly_white',
-                    title = f'{dep_name} Forward Returns <br><sup>Across {var1_name} and {var2_name}</sup>'
+                    title = f'{dep_name} Forward Returns <br><sup>Across {var1_name} and {var2_name}</sup>',
+                    
                     )
     fig.update_xaxes(showgrid=True)
     fig.update_traces(hovertemplate = "x-score: %{x} <br>y-score: %{y} </br>Forward Return: %{z}")
     
-    fig.add_shape(type="rect",
+    if curr_scores_dict:
+        fig.add_shape(type="rect",
               x0=curr_scores_dict[var2_name]-0.5, y0=curr_scores_dict[var1_name]-0.5, 
               x1=curr_scores_dict[var2_name]+0.5, y1=curr_scores_dict[var1_name]+0.5,
               line=dict(color="blue", width = 4),
@@ -299,11 +314,17 @@ def run():
     df[dependent_name] = get_returns(df[dependent_name],
                                      st.session_state.forward * days_in_month)
     
-    pivot_df = create_pivot(df, col_maps)
-    
+    pivot_df, two_way_piv = create_pivots(df, col_maps)
+
+    #if not table_type:
     fig = create_fig(pivot_df, curr_scores_dict, col_maps)
+    fig_two_way = create_fig(two_way_piv, None, col_maps)
+    #print(curr_scores_dict)
+    #else:
+        #pass
+        #fig = create_fig()
     
-    return fig
+    return fig, fig_two_way
 
 
 daily_data = get_Data(daily=True)
@@ -392,7 +413,7 @@ class Grid():
         df[dependent_name] = get_returns(df[dependent_name],
                                         st.session_state.forward * days_in_month)
         
-        self.pivot_df = create_pivot(df, self.col_maps)
+        self.pivot_df, self.two_way_piv = create_pivots(df, self.col_maps)
         
 
     def get_figure(self, 
@@ -451,9 +472,13 @@ class Grid():
 
 
 
-
-
-########################################################## LAYOUT ##########################################################
+##################################################################################### LAYOUT ########################################################################################
+##################################################################################### LAYOUT ########################################################################################
+##################################################################################### LAYOUT ########################################################################################
+##################################################################################### LAYOUT ########################################################################################
+##################################################################################### LAYOUT ########################################################################################
+##################################################################################### LAYOUT ########################################################################################
+##################################################################################### LAYOUT ########################################################################################
 
 
 
@@ -574,16 +599,19 @@ with col1:
     bounds = col_under1.number_input(label='Z-Score Bounds',
                                     value=3,
                                     max_value=8,
-                                    min_value=3,
+                                    min_value=2,
                                     key='score_bounds')
 
     
 
-
-
-
-fig = run()
     
-st.plotly_chart(fig, use_container_width = True)
+
+fig, fig_to_way = run()
+
+
+fig_cols = st.columns(2)
+
+fig_cols[0].plotly_chart(fig_to_way, use_container_width = True)
+fig_cols[1].plotly_chart(fig, use_container_width = True)
 
 #print(st.session_state.count)
