@@ -9,6 +9,14 @@ import json
 import refr
 import DataUpdate as up
 
+##### CONFIG ###### 
+st.set_page_config(
+    page_title="Grid Risk",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+################### 
+
 
 ################################ CONSTANTS ###################################
 
@@ -480,13 +488,7 @@ class Grid():
 ##################################################################################### LAYOUT ########################################################################################
 ##################################################################################### LAYOUT ########################################################################################
 
-##### CONFIG ###### 
-st.set_page_config(
-    page_title="Grid Risk",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
-################### 
+
 
 st.title("Grid Risk Management")
 
