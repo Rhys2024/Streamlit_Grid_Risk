@@ -318,9 +318,9 @@ def run():
 
     title = f'{dependent} Forward Returns'
     if st.session_state.gradient:
-        subtitle = f'Across {col_maps['var1']} and {col_maps['var2']} {diff_days}-day changes'
+        subtitle = f"Across {col_maps['var1']} and {col_maps['var2']} {diff_days}-day changes"
     else:
-        subtitle = f'Across {col_maps['var1']} and {col_maps['var2']} levels'
+        subtitle = f"Across {col_maps['var1']} and {col_maps['var2']} levels"
 
 
     ######################################
