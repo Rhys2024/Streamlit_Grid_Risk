@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import plotly.graph_objects as go
 import datetime
 import json
 
@@ -32,7 +33,7 @@ benchmark_options = ['None'] + [f"{key} - {sub}" for key in refr.benchmarks
 
 days_in_month = 21
 
-# /Users/rhys/Desktop/grid_risk_management/
+
 with open("data/references/cols_for_factor.json", "r") as write_file:
     cols_for_factor = json.load(write_file)
 
@@ -44,15 +45,12 @@ with open("data/references/cols_for_factor.json", "r") as write_file:
 @st.cache_data()
 def get_Data(daily=True):
     
-    # /Users/rhys/Desktop/grid_risk_management/
     if daily:
         temp_df = pd.read_csv(f'data/full_daily_data.csv', 
                           header=[0, 1],
                           index_col=0,
                           parse_dates=True)
         return temp_df
-    
-    # /Users/rhys/Desktop/grid_risk_management/
 
     temp_df = pd.read_csv(f'data/full_monthly_data.csv', 
                           header=[0, 1],
@@ -115,16 +113,9 @@ def make_column_map(frame):
 def create_df(var1, var2, dependent, col_for_3, 
               optional_col, benchmark, equal_weight):
     
-    # fetchFile()
-    # st.session_state.equal_weight
     if equal_weight:
         dependent = dependent + ' - Equal-Weight'
-    
-    #col_for_3 = st.session_state.column_choice
-    #optional_col = st.session_state.optional_col
-    #benchmark = st.session_state.benchmark
-    
-    
+
     if optional_col != 'None' and benchmark != 'None':
         st.warning('It is not recommend to Neutralize against both a Benchmark and another Factor Quantile!')
     
@@ -156,13 +147,11 @@ def scale_frame(frame, gradient):
         diff_d = None
     
     bounds = (-st.session_state.score_bounds, st.session_state.score_bounds)
-    #bounds = (-state_bounds, state_bounds)
-    
-    # st.session_state.lookback
-    # st.session_state.gradient
+
     scaled_frame = rolling_z_scores(frame, lookback = st.session_state.lookback * 21,
                                         gradient = st.session_state.gradient, 
                                         grad_period = diff_d,
+                                        round_zs=False,
                                         bounds = bounds)
     
     scaled_frame = scaled_frame.dropna(axis = 0, how = 'any')
@@ -223,7 +212,6 @@ def create_fig(pivot_df,
                curr_scores_dict, 
                col_maps):
     
-    #col_maps = make_column_map(df)
     var1_name = col_maps['var1']
     var2_name = col_maps['var2']
     dependent_name = col_maps['dependent']
@@ -251,14 +239,10 @@ def create_fig(pivot_df,
         )
         )
     
-    dep_name = handle_dependent(dependent)
-    
-    #fig.update_layout(paper_bgcolor='white')
-    #, paper_bgcolor="LightSteelBlue"
+
     fig.update_layout(plot_bgcolor='gray', 
                     template = 'plotly_white',
-                    title = f'{dep_name} Forward Returns <br><sup>Across {var1_name} and {var2_name}</sup>',
-                    
+                    #title = f'{dep_name} Forward Returns <br><sup>Across {var1_name} and {var2_name}</sup>',
                     )
     fig.update_xaxes(showgrid=True)
     fig.update_traces(hovertemplate = "x-score: %{x} <br>y-score: %{y} </br>Forward Return: %{z}")
@@ -270,20 +254,14 @@ def create_fig(pivot_df,
               line=dict(color="blue", width = 4),
               )
     
-    #st.subheader(f'{dep_name} Forward Returns')
-    #st.write(f'Across {var1_name} and {var2_name}')
-    #st.plotly_chart(fig, use_container_width = True)
-    
     return fig
 
 
 
 def run():
-    #assert isinstance(ivars, list), 'must be a list'
     ivars = st.session_state.ivars
     dependent = st.session_state.factor
     
-    #if not is_valid_vars(ivars): 
     validate_vars(ivars)
     
     var1, var2 = ivars
@@ -303,9 +281,13 @@ def run():
     vars_data = pd.concat(list_of_vars, 
                axis = 1).dropna(axis = 0, how = 'any').sort_index()
     
-    scores_data = scale_frame(vars_data, 
+    scores_data_raw = scale_frame(vars_data, 
                               gradient=st.session_state.gradient, 
                               )
+    
+    scores_data = scores_data_raw.round(0)
+
+    scores_data_raw = scores_data_raw.groupby([scores_data_raw.index.month, scores_data_raw.index.year]).mean()
     
     curr_scores_dict = current_scores(scores_data)
     
@@ -315,7 +297,6 @@ def run():
     
     df = get_timeframe(base_df)
     
-    
     col_maps = make_column_map(df)
     dependent_name = col_maps['dependent']
     
@@ -324,14 +305,29 @@ def run():
     
     pivot_df, two_way_piv = create_pivots(df, col_maps)
 
-    #if not table_type:
     fig = create_fig(pivot_df, curr_scores_dict, col_maps)
     fig_two_way = create_fig(two_way_piv, None, col_maps)
-    #print(curr_scores_dict)
-    #else:
-        #pass
-        #fig = create_fig()
-    
+
+
+    #fig = px.line(x = scores_data_raw[col_maps['var2']].tail(24).values, 
+                     #y = scores_data_raw[col_maps['var1']].tail(24).values, 
+                     #labels=scores_data_raw.index,
+                     #color=scores_data_raw.levels[1].year
+                    # )
+    #st.plotly_chart(fig)
+
+    title = f'{dependent} Forward Returns'
+    if st.session_state.gradient:
+        subtitle = f'Across {col_maps['var1']} and {col_maps['var2']} {diff_days}-day changes'
+    else:
+        subtitle = f'Across {col_maps['var1']} and {col_maps['var2']} levels'
+
+
+    ######################################
+    st.subheader(title)
+    st.markdown(subtitle)
+    ######################################
+
     return fig, fig_two_way
 
 
@@ -501,21 +497,14 @@ if data_update:
     st.success('Done!')
 
 st.divider()
-#st.subheader('Filters')
 
 col1, col2 = st.columns(2)
 
 
-# First Variable
 ivars = col1.multiselect(label='Pick 2 Variables', 
                       options = refr.daily_macro_options,
                       default = default_vars,
                       key='ivars')
-# Second Variable
-#var2 = col1.selectbox(label='Second Variable',
-                      #placeholder='Yield Curves - 10Y-2Y',
-                      #options=refr.daily_macro_options, 
-                      #key='var2')
 
 dependent = col2.selectbox(label='Pick a Factor',
                       options=factor_options_daily,
@@ -541,6 +530,24 @@ with col1:
 
 
 with col1:
+
+    over_date_cols = st.columns(3)
+
+    lookback = over_date_cols[0].number_input(label = 'Lookback (months)', min_value=1, 
+                        max_value=36, value = 12, step=3,
+                        key='lookback')
+        
+    forward = over_date_cols[1].number_input(label = 'Forward Returns (months)', min_value=1, 
+                            max_value=36, value = 12, step=3,
+                            key='forward')
+
+    bounds = over_date_cols[2].number_input(label='Z-Score Bounds',
+                                    value=3,
+                                    max_value=8,
+                                    min_value=2,
+                                    key='score_bounds')
+
+with col1:
         sub_col_dates1, sub_col_dates2 = st.columns(2)
         
         start_date = sub_col_dates1.date_input(label = "Start Date", 
@@ -553,73 +560,36 @@ with col1:
                                              max_value = datetime.date.today(),
                                              key = 'end_date', format="YYYY-MM-DD")
         
-        lookback = sub_col_dates1.number_input(label = 'Lookback (months)', min_value=1, 
-                        max_value=36, value = 12, step=3,
-                        key='lookback')
-        
-        forward = sub_col_dates2.number_input(label = 'Forward Returns (months)', min_value=1, 
-                            max_value=36, value = 12, step=3,
-                            key='forward')
-   
 
-# [col for col in df3.columns if '<= 0' not in  col]
 cols = cols_for_factor[st.session_state.factor]
- 
+
 
 toggle_equal_weight = col2.toggle(label='Show Equal-Weight',
                             value = False,
                             key='equal_weight')
 
-# 'Date' not in col and 
 with col2:
     
     sub_col1, sub_col2 = st.columns(2)
     
-    col_for_3 = sub_col1.selectbox(label='Choose Column:',
-                    options= cols, 
-                    key='column_choice')
     
-    #sub_col2.title('minus')
+    col_for_3 = sub_col1.selectbox(label='Choose Column:',
+                        options= cols, 
+                        key='column_choice')
     
     optional_col = sub_col2.selectbox(label='Neutralize Against:',
                     options= ['None'] + cols,
                     placeholder = 'None',
                     key='optional_col')
 
-
-#with col2:
-
-    #sub_col11, sub_col22 = st.columns(2)
-
 benchmark = col2.selectbox(label='Benchmark', options = benchmark_options, key = 'benchmark')
-
-#forward_period = 
-    
 
 
 col_under_all1, col_under_all2, col_under_all3 = st.columns(3)
 
-
-with col1:
-    
-    col_under1, col_under2 = st.columns(2)
-
-    bounds = col_under1.number_input(label='Z-Score Bounds',
-                                    value=3,
-                                    max_value=8,
-                                    min_value=2,
-                                    key='score_bounds')
-
-    
-
-    
-
 fig, fig_to_way = run()
-
 
 fig_cols = st.columns(2)
 
 fig_cols[0].plotly_chart(fig_to_way, use_container_width = True)
 fig_cols[1].plotly_chart(fig, use_container_width = True)
-
-#print(st.session_state.count)
